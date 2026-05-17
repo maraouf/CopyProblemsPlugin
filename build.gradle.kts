@@ -30,10 +30,15 @@ kotlin {
 }
 
 intellijPlatform {
+    sandboxContainer = file("${System.getProperty("user.home")}/.cache/copyproblems-sandbox")
     pluginConfiguration {
         ideaVersion {
             sinceBuild = "242"
             untilBuild = "261.*"
         }
     }
+}
+
+tasks.buildPlugin {
+    destinationDirectory = layout.projectDirectory.dir("dist")
 }

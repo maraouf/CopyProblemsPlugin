@@ -4,6 +4,7 @@
 # IntelliJ Platform plugin SDK sandbox & Kotlin daemon
 .intellijPlatform/
 .kotlin/
+build/
 
 # IDE
 *.iml
