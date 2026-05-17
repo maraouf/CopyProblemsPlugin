@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ Platform plugin SDK sandbox & Kotlin daemon
+.intellijPlatform/
+.kotlin/
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code workspace state
+.claude/
