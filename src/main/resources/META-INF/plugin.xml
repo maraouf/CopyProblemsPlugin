@@ -18,7 +18,7 @@
         or press <kbd>Ctrl+Shift+Alt+P</kbd> (Windows/Linux) / <kbd>⌘+Shift+Alt+P</kbd> (Mac).
     ]]></description>
 
-<change-notes><![CDATA[
+    <change-notes><![CDATA[
         <b>1.0.8</b>
         <ul>
             <li>Internal build maintenance: fixed <code>build.gradle.kts</code> syntax and bumped the Gradle wrapper to 9.x for compatibility with IntelliJ Platform Gradle Plugin 2.16.0.</li>
@@ -26,8 +26,7 @@
         <b>1.0.7</b>
         <ul>
             <li>Added action icon shown in the editor right-click menu and Tools menu (light + dark variants).</li>
-            <li>Renamed package from <code>com.omnigrid</code> to <code>com.moraouf</code>.</li>
-            <li>Vendor renamed to Mohamed Abdelraouf.</li>
+            <li>Renamed package to <code>com.moraouf</code>.</li>
         </ul>
         <b>1.0.6</b>
         <ul>
@@ -73,10 +72,10 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable
-            parentId="tools"
-            instance="com.moraouf.copyproblems.CopyProblemsConfigurable"
-            id="com.moraouf.copyproblems.settings"
-            displayName="Copy All Problems"/>
+                parentId="tools"
+                instance="com.moraouf.copyproblems.CopyProblemsConfigurable"
+                id="com.moraouf.copyproblems.settings"
+                displayName="Copy All Problems"/>
     </extensions>
 
     <idea-version since-build="242" until-build="261.*"/>
