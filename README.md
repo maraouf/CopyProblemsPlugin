@@ -76,7 +76,7 @@ Or open the [marketplace page](https://plugins.jetbrains.com/plugin/31816-copy-a
 
 1. **Settings / Preferences → Plugins**.
 2. Click the gear icon (⚙) at the top → **Install Plugin from Disk…**
-3. Select the zip from `dist/` (or `build/distributions/`).
+3. Select the zip from `dist/`.
 4. Click **OK**, then **Restart IDE** when prompted.
 
 ## Uninstall
