@@ -1,8 +1,7 @@
-<img src="src/main/resources/META-INF/pluginIcon.svg" alt="Copy All Problems icon" width="96" align="left" />
-
-# Copy All Problems — IntelliJ Platform Plugin
-
-<br clear="left" />
+<table><tr>
+<td><img src="src/main/resources/META-INF/pluginIcon.svg" alt="Copy All Problems icon" width="96" /></td>
+<td><h1>Copy All Problems — IntelliJ Platform Plugin</h1></td>
+</tr></table>
 
 A tiny plugin that adds an action to copy every diagnostic for the currently
 active file to the clipboard, with file path, line, column, severity, and
@@ -25,6 +24,8 @@ beszel.py:87:12 [ERROR] Expected type 'int', got 'str' instead
 beszel.py:103:1 [WEAK_WARNING] Function 'bar' may be 'static'
 ```
 
+![Output example](docs/screenshots/output-example.png)
+
 ## Settings
 
 **Settings → Tools → Copy All Problems** — toggle which severities are included
@@ -40,11 +41,13 @@ After installing the plugin (see below):
 2. Wait a beat for the analyzer to finish (watch the bottom status bar — when
    "Analyzing…" disappears, you're good).
 3. Either:
-   - Right-click anywhere in the editor → **Copy All Problems with Line Numbers**
-   - Or press **Ctrl+Shift+Alt+P** (Windows/Linux) / **⌘+Shift+Alt+P** (Mac)
-   - Or **Tools → Copy All Problems with Line Numbers**
+    - Right-click anywhere in the editor → **Copy All Problems with Line Numbers**
+    - Or press **Ctrl+Shift+Alt+P** (Windows/Linux) / **⌘+Shift+Alt+P** (Mac)
+    - Or **Tools → Copy All Problems with Line Numbers**
 4. A balloon notification confirms how many problems were copied.
 5. Paste anywhere.
+
+![Editor context menu](docs/screenshots/editor-context-menu.png)
 
 ## Build from source
 
