@@ -11,6 +11,12 @@ description — one entry per line.
 Works in any IntelliJ-platform IDE: IntelliJ IDEA, PyCharm (Community and
 Professional), WebStorm, GoLand, RubyMine, CLion, etc.
 
+**Install from JetBrains Marketplace:**
+[plugins.jetbrains.com/plugin/31816-copy-all-problems](https://plugins.jetbrains.com/plugin/31816-copy-all-problems)
+
+[![JetBrains Marketplace Version](https://img.shields.io/jetbrains/plugin/v/31816-copy-all-problems.svg)](https://plugins.jetbrains.com/plugin/31816-copy-all-problems)
+[![JetBrains Marketplace Downloads](https://img.shields.io/jetbrains/plugin/d/31816-copy-all-problems.svg)](https://plugins.jetbrains.com/plugin/31816-copy-all-problems)
+
 ## Output format
 
 ```
@@ -58,11 +64,20 @@ build/distributions/copy-problems-1.0.0.zip
 
 ## Install in your IDE
 
-1. Open your IDE.
-2. **Settings / Preferences → Plugins**.
-3. Click the gear icon (⚙) at the top → **Install Plugin from Disk…**
-4. Select the zip from `build/distributions/`.
-5. Click **OK**, then **Restart IDE** when prompted.
+**Option A — From JetBrains Marketplace (recommended):**
+
+1. **Settings / Preferences → Plugins → Marketplace**.
+2. Search for **Copy All Problems**.
+3. Click **Install**, then **Restart IDE** when prompted.
+
+Or open the [marketplace page](https://plugins.jetbrains.com/plugin/31816-copy-all-problems) directly and use the **Install to IDE** button.
+
+**Option B — From a local zip (e.g. a build from source):**
+
+1. **Settings / Preferences → Plugins**.
+2. Click the gear icon (⚙) at the top → **Install Plugin from Disk…**
+3. Select the zip from `dist/` (or `build/distributions/`).
+4. Click **OK**, then **Restart IDE** when prompted.
 
 ## Uninstall
 
@@ -71,10 +86,12 @@ icon next to it → **Uninstall** → restart.
 
 ## How it works
 
-The plugin uses `DaemonCodeAnalyzerImpl.getHighlights(document, null, project)`
-— the same engine that powers the Problems tool window — to read every
-highlight currently computed for the document. It filters out internal markers
-(things without a description), sorts by offset, and writes:
+The plugin uses `DaemonCodeAnalyzerEx.processHighlights(document, project,
+null, 0, document.textLength, processor)` — the same engine that powers the
+Problems tool window — to read every highlight currently computed for the
+document. The call is wrapped in a read action. The collected highlights are
+filtered (drop entries without a description and pure visual annotations),
+sorted by offset (or by severity then offset, per settings), and written as:
 
 ```
 <filename>:<line>:<col> [<severity>] <description>
@@ -82,10 +99,8 @@ highlight currently computed for the document. It filters out internal markers
 
 to the system clipboard via `CopyPasteManager`.
 
-`DaemonCodeAnalyzerImpl` is an internal IntelliJ Platform class. It's stable
-across 2022.3 through 2024.x. If a future release breaks it, the action will
-log a `NoSuchMethodError` and the keyboard shortcut will be a no-op until the
-plugin is updated.
+If a future IntelliJ release breaks the `DaemonCodeAnalyzerEx` signature, the
+action catches the error and shows it in a dialog instead of failing silently.
 
 ## Files
 

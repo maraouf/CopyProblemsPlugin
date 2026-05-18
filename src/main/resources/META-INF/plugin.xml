@@ -1,8 +1,8 @@
 <idea-plugin>
     <id>com.moraouf.copyproblems</id>
     <name>Copy All Problems</name>
-    <version>1.0.9</version>
-    <vendor email="m.a.raouf@gmail.com" url="https://moraouf.com">Mohamed Abdelraouf</vendor>
+    <version>1.0.10</version>
+    <vendor email="me@moraouf.com" url="https://moraouf.com">Mohamed Abdelraouf</vendor>
 
     <description><![CDATA[
         Adds an action to copy every diagnostic (errors, warnings, weak warnings, info)
@@ -19,6 +19,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.10</b>
+        <ul>
+            <li>Replaced internal <code>DaemonCodeAnalyzerImpl.getHighlights(...)</code> call with the recommended <code>DaemonCodeAnalyzerEx.processHighlights(...)</code> entry point, clearing the JetBrains Marketplace "internal API usage" warning.</li>
+            <li>Added <code>LICENSE.md</code> (MIT) and a settings-panel screenshot to the README.</li>
+        </ul>
         <b>1.0.9</b>
         <ul>
             <li>Filtered out non-problem highlights that the Problems tool window already hides: symbol-coloring annotations (severity below INFORMATION, e.g. "Automatically declared based on the expected type") and annotator-only INFORMATION markers (URL hyperlinks like "Open in browser (Ctrl+Click, Ctrl+B)", identifier highlighting, etc.).</li>

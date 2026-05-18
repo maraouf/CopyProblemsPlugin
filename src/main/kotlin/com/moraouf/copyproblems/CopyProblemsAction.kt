@@ -1,19 +1,20 @@
 package com.moraouf.copyproblems
 
-import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl
+import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerEx
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.ui.Messages
+import com.intellij.util.Processor
 import java.awt.datatransfer.StringSelection
 
 class CopyProblemsAction : AnAction() {
 
-    @Suppress("UnstableApiUsage") // DaemonCodeAnalyzerImpl.getHighlights is @ApiStatus.Internal; no public equivalent returns the Problems-panel highlight set.
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         val editor = e.getData(CommonDataKeys.EDITOR) ?: return
@@ -23,7 +24,21 @@ class CopyProblemsAction : AnAction() {
         val settings = CopyProblemsSettings.getInstance()
 
         val highlights = try {
-            DaemonCodeAnalyzerImpl.getHighlights(document, null, project)
+            ReadAction.compute<List<HighlightInfo>, Throwable> {
+                val collected = mutableListOf<HighlightInfo>()
+                DaemonCodeAnalyzerEx.processHighlights(
+                    document,
+                    project,
+                    null,
+                    0,
+                    document.textLength,
+                    Processor { info ->
+                        collected.add(info)
+                        true
+                    },
+                )
+                collected
+            }
         } catch (t: Throwable) {
             Messages.showErrorDialog(
                 project,
