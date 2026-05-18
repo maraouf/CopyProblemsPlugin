@@ -1,7 +1,8 @@
-<table><tr>
-<td><img src="src/main/resources/META-INF/pluginIcon.svg" alt="Copy All Problems icon" width="96" /></td>
-<td><h1>Copy All Problems — IntelliJ Platform Plugin</h1></td>
-</tr></table>
+<img src="src/main/resources/META-INF/pluginIcon.svg" alt="Copy All Problems icon" width="96" align="left" />
+
+# Copy All Problems — IntelliJ Platform Plugin
+
+<br clear="left" />
 
 A tiny plugin that adds an action to copy every diagnostic for the currently
 active file to the clipboard, with file path, line, column, severity, and
