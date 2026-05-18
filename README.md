@@ -1,15 +1,12 @@
-<img src="src/main/resources/META-INF/pluginIcon.svg" alt="Copy All Problems icon" width="96" align="left" />
+<p align="center">
+  <img src="src/main/resources/META-INF/pluginIcon.svg" alt="Copy All Problems" width="96" />
+</p>
 
 # Copy All Problems — IntelliJ Platform Plugin
 
-<br clear="left" />
+> A tiny plugin that adds an action to copy every diagnostic for the currently active file to the clipboard, with file path, line, column, severity, and description — one entry per line.
 
-A tiny plugin that adds an action to copy every diagnostic for the currently
-active file to the clipboard, with file path, line, column, severity, and
-description — one entry per line.
-
-Works in any IntelliJ-platform IDE: IntelliJ IDEA, PyCharm (Community and
-Professional), WebStorm, GoLand, RubyMine, CLion, etc.
+Works in any IntelliJ-platform IDE: IntelliJ IDEA, PyCharm (Community and Professional), WebStorm, GoLand, RubyMine, CLion, etc.
 
 **Install from JetBrains Marketplace:**
 [plugins.jetbrains.com/plugin/31816-copy-all-problems](https://plugins.jetbrains.com/plugin/31816-copy-all-problems)
