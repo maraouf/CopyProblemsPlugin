@@ -7,7 +7,8 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.util.Computable
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.ui.Messages
 import com.intellij.util.Processor
@@ -24,21 +25,23 @@ class CopyProblemsAction : AnAction() {
         val settings = CopyProblemsSettings.getInstance()
 
         val highlights = try {
-            runReadAction {
-                val collected = mutableListOf<HighlightInfo>()
-                DaemonCodeAnalyzerEx.processHighlights(
-                    document,
-                    project,
-                    null,
-                    0,
-                    document.textLength,
-                    Processor { info ->
-                        collected.add(info)
-                        true
-                    },
-                )
-                collected
-            }
+            ApplicationManager.getApplication().runReadAction(
+                Computable<List<HighlightInfo>> {
+                    val collected = mutableListOf<HighlightInfo>()
+                    DaemonCodeAnalyzerEx.processHighlights(
+                        document,
+                        project,
+                        null,
+                        0,
+                        document.textLength,
+                        Processor { info ->
+                            collected.add(info)
+                            true
+                        },
+                    )
+                    collected
+                },
+            )
         } catch (t: Throwable) {
             Messages.showErrorDialog(
                 project,

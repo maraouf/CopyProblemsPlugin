@@ -36,7 +36,6 @@
         <b>1.0.7</b>
         <ul>
             <li>Added action icon shown in the editor right-click menu and Tools menu (light + dark variants).</li>
-            <li>Renamed package to <code>com.moraouf</code>.</li>
         </ul>
         <b>1.0.6</b>
         <ul>
@@ -45,7 +44,6 @@
         <b>1.0.5</b>
         <ul>
             <li>Added plugin icon (light + dark variants).</li>
-            <li>Vendor updated to Mohamed Abdelraouf.</li>
         </ul>
         <b>1.0.4</b>
         <ul>
