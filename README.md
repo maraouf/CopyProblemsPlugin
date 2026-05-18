@@ -19,6 +19,13 @@ beszel.py:87:12 [ERROR] Expected type 'int', got 'str' instead
 beszel.py:103:1 [WEAK_WARNING] Function 'bar' may be 'static'
 ```
 
+## Settings
+
+**Settings → Tools → Copy All Problems** — toggle which severities are included
+and how each line is formatted.
+
+![Settings panel](docs/screenshots/settings-panel.png)
+
 ## How to use
 
 After installing the plugin (see below):
