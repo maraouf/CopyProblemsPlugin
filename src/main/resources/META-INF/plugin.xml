@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.moraouf.copyproblems</id>
     <name>Copy All Problems</name>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <vendor email="m.a.raouf@gmail.com" url="https://moraouf.com">Mohamed Abdelraouf</vendor>
 
     <description><![CDATA[
@@ -19,6 +19,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.9</b>
+        <ul>
+            <li>Filtered out non-problem highlights that the Problems tool window already hides: symbol-coloring annotations (severity below INFORMATION, e.g. "Automatically declared based on the expected type") and annotator-only INFORMATION markers (URL hyperlinks like "Open in browser (Ctrl+Click, Ctrl+B)", identifier highlighting, etc.).</li>
+            <li>Real INFORMATION-level inspection results (e.g. unused-symbol hints) are still included when the INFORMATION checkbox is on.</li>
+        </ul>
         <b>1.0.8</b>
         <ul>
             <li>Internal build maintenance: fixed <code>build.gradle.kts</code> syntax and bumped the Gradle wrapper to 9.x for compatibility with IntelliJ Platform Gradle Plugin 2.16.0.</li>
