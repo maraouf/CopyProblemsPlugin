@@ -125,4 +125,4 @@ copy-problems-plugin/
 
 ## License
 
-[MIT](LICENSE.md) © Mohamed Abdelraouf
+[MIT](LICENSE) © Mohamed Abdelraouf
