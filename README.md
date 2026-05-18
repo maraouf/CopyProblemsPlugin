@@ -99,4 +99,4 @@ copy-problems-plugin/
 
 ## License
 
-Public domain — do whatever you want with this.
+[MIT](LICENSE.md) © Mohamed Abdelraouf
