@@ -3,9 +3,11 @@ package com.moraouf.copyproblems
 import com.intellij.openapi.options.Configurable
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
+import com.intellij.ui.components.JBRadioButton
 import com.intellij.util.ui.JBUI
 import javax.swing.Box
 import javax.swing.BoxLayout
+import javax.swing.ButtonGroup
 import javax.swing.JComponent
 import javax.swing.JPanel
 
@@ -26,6 +28,38 @@ class CopyProblemsConfigurable : Configurable {
     private val cbIncludeColumn = JBCheckBox("Include column number (line:col vs. line only)")
     private val cbIncludeSeverityTag = JBCheckBox("Include [SEVERITY] tag in each line")
     private val cbSortBySeverityFirst = JBCheckBox("Sort by severity first (errors before warnings), then by line")
+
+    private val rbModal = JBRadioButton("Modal popup with OK button")
+    private val rbBalloon = JBRadioButton("Balloon notification (auto-dismisses in IDE corner)")
+    private val rbEditorHint = JBRadioButton("Editor hint (small popup near the caret)")
+    private val rbSilent = JBRadioButton("Silent (copy without any notification)")
+
+    // Single source of truth for the parallel checkbox <-> State plumbing used by isModified / apply / reset.
+    private val checkboxBindings: List<CheckboxBinding> = listOf(
+        CheckboxBinding(cbError, { it.includeError }) { s, v -> s.includeError = v },
+        CheckboxBinding(cbWarning, { it.includeWarning }) { s, v -> s.includeWarning = v },
+        CheckboxBinding(cbWeakWarning, { it.includeWeakWarning }) { s, v -> s.includeWeakWarning = v },
+        CheckboxBinding(cbInformation, { it.includeInformation }) { s, v -> s.includeInformation = v },
+        CheckboxBinding(cbGrammarError, { it.includeGrammarError }) { s, v -> s.includeGrammarError = v },
+        CheckboxBinding(cbTypo, { it.includeTypo }) { s, v -> s.includeTypo = v },
+        CheckboxBinding(cbServerProblem, { it.includeServerProblem }) { s, v -> s.includeServerProblem = v },
+        CheckboxBinding(cbStyleSuggestion, { it.includeStyleSuggestion }) { s, v -> s.includeStyleSuggestion = v },
+        CheckboxBinding(
+            cbUnknownSeverities,
+            { it.includeUnknownSeverities },
+        ) { s, v -> s.includeUnknownSeverities = v },
+        CheckboxBinding(cbIncludeColumn, { it.includeColumn }) { s, v -> s.includeColumn = v },
+        CheckboxBinding(cbIncludeSeverityTag, { it.includeSeverityTag }) { s, v -> s.includeSeverityTag = v },
+        CheckboxBinding(cbSortBySeverityFirst, { it.sortBySeverityFirst }) { s, v -> s.sortBySeverityFirst = v },
+    )
+
+    init {
+        val styleGroup = ButtonGroup()
+        styleGroup.add(rbModal)
+        styleGroup.add(rbBalloon)
+        styleGroup.add(rbEditorHint)
+        styleGroup.add(rbSilent)
+    }
 
     override fun getDisplayName(): String = "Copy All Problems"
 
@@ -54,55 +88,60 @@ class CopyProblemsConfigurable : Configurable {
         panel.add(cbIncludeSeverityTag)
         panel.add(cbSortBySeverityFirst)
 
+        panel.add(Box.createVerticalStrut(16))
+        panel.add(JBLabel("<html><b>Notification style</b> &mdash; how the result is reported:</html>"))
+        panel.add(Box.createVerticalStrut(8))
+        panel.add(rbModal)
+        panel.add(rbBalloon)
+        panel.add(rbEditorHint)
+        panel.add(rbSilent)
+
         reset()
         return panel
     }
 
     override fun isModified(): Boolean {
         val s = settings.state
-        return cbError.isSelected != s.includeError
-            || cbWarning.isSelected != s.includeWarning
-            || cbWeakWarning.isSelected != s.includeWeakWarning
-            || cbInformation.isSelected != s.includeInformation
-            || cbGrammarError.isSelected != s.includeGrammarError
-            || cbTypo.isSelected != s.includeTypo
-            || cbServerProblem.isSelected != s.includeServerProblem
-            || cbStyleSuggestion.isSelected != s.includeStyleSuggestion
-            || cbUnknownSeverities.isSelected != s.includeUnknownSeverities
-            || cbIncludeColumn.isSelected != s.includeColumn
-            || cbIncludeSeverityTag.isSelected != s.includeSeverityTag
-            || cbSortBySeverityFirst.isSelected != s.sortBySeverityFirst
+        return checkboxBindings.any { it.isModified(s) } || (selectedStyle() != s.notificationStyle)
     }
 
     override fun apply() {
         val s = settings.state
-        s.includeError = cbError.isSelected
-        s.includeWarning = cbWarning.isSelected
-        s.includeWeakWarning = cbWeakWarning.isSelected
-        s.includeInformation = cbInformation.isSelected
-        s.includeGrammarError = cbGrammarError.isSelected
-        s.includeTypo = cbTypo.isSelected
-        s.includeServerProblem = cbServerProblem.isSelected
-        s.includeStyleSuggestion = cbStyleSuggestion.isSelected
-        s.includeUnknownSeverities = cbUnknownSeverities.isSelected
-        s.includeColumn = cbIncludeColumn.isSelected
-        s.includeSeverityTag = cbIncludeSeverityTag.isSelected
-        s.sortBySeverityFirst = cbSortBySeverityFirst.isSelected
+        checkboxBindings.forEach { it.save(s) }
+        s.notificationStyle = selectedStyle()
     }
 
     override fun reset() {
         val s = settings.state
-        cbError.isSelected = s.includeError
-        cbWarning.isSelected = s.includeWarning
-        cbWeakWarning.isSelected = s.includeWeakWarning
-        cbInformation.isSelected = s.includeInformation
-        cbGrammarError.isSelected = s.includeGrammarError
-        cbTypo.isSelected = s.includeTypo
-        cbServerProblem.isSelected = s.includeServerProblem
-        cbStyleSuggestion.isSelected = s.includeStyleSuggestion
-        cbUnknownSeverities.isSelected = s.includeUnknownSeverities
-        cbIncludeColumn.isSelected = s.includeColumn
-        cbIncludeSeverityTag.isSelected = s.includeSeverityTag
-        cbSortBySeverityFirst.isSelected = s.sortBySeverityFirst
+        checkboxBindings.forEach { it.load(s) }
+        when (s.notificationStyle) {
+            CopyProblemsSettings.NotificationStyle.MODAL -> rbModal.isSelected = true
+            CopyProblemsSettings.NotificationStyle.BALLOON -> rbBalloon.isSelected = true
+            CopyProblemsSettings.NotificationStyle.EDITOR_HINT -> rbEditorHint.isSelected = true
+            CopyProblemsSettings.NotificationStyle.SILENT -> rbSilent.isSelected = true
+        }
+    }
+
+    private fun selectedStyle(): CopyProblemsSettings.NotificationStyle = when {
+        rbBalloon.isSelected -> CopyProblemsSettings.NotificationStyle.BALLOON
+        rbEditorHint.isSelected -> CopyProblemsSettings.NotificationStyle.EDITOR_HINT
+        rbSilent.isSelected -> CopyProblemsSettings.NotificationStyle.SILENT
+        else -> CopyProblemsSettings.NotificationStyle.MODAL
+    }
+
+    private class CheckboxBinding(
+        private val cb: JBCheckBox,
+        private val get: (CopyProblemsSettings.State) -> Boolean,
+        private val set: (CopyProblemsSettings.State, Boolean) -> Unit,
+    ) {
+        fun isModified(s: CopyProblemsSettings.State): Boolean = cb.isSelected != get(s)
+
+        fun load(s: CopyProblemsSettings.State) {
+            cb.isSelected = get(s)
+        }
+
+        fun save(s: CopyProblemsSettings.State) {
+            set(s, cb.isSelected)
+        }
     }
 }

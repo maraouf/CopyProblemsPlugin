@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.moraouf"
-version = "1.0.10"
+version = "1.0.11"
 
 repositories {
     mavenCentral()
@@ -41,4 +41,13 @@ intellijPlatform {
 
 tasks.buildPlugin {
     destinationDirectory = layout.projectDirectory.dir("dist")
+}
+
+// Disabled: launches a full headless IDE that instantiates every Configurable to scrape searchable
+// text, which (a) adds a slow heavy step to every build and (b) crashes when an unrelated IDE-side
+// Configurable hits user-environment edge cases (e.g. a malformed Windows PATH tripping the Gradle
+// plugin's path parser). Our single Configurable is still findable by its display name in the
+// Settings search without this index.
+tasks.buildSearchableOptions {
+    enabled = false
 }

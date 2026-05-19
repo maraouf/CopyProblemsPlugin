@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.moraouf.copyproblems</id>
     <name>Copy All Problems</name>
-    <version>1.0.10</version>
+    <version>1.0.11</version>
     <vendor email="me@moraouf.com" url="https://moraouf.com">Mohamed Abdelraouf</vendor>
 
     <description><![CDATA[
@@ -19,6 +19,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.11</b>
+        <ul>
+            <li>New <b>Notification style</b> setting (Settings &rarr; Tools &rarr; Copy All Problems): choose how the result is reported &mdash; modal popup with OK (default, unchanged from 1.0.1+), balloon notification, editor hint near the caret, or silent (no notification at all). Pick a non-modal style to skip the OK click.</li>
+        </ul>
         <b>1.0.10</b>
         <ul>
             <li>Replaced internal <code>DaemonCodeAnalyzerImpl.getHighlights(...)</code> call with the recommended <code>DaemonCodeAnalyzerEx.processHighlights(...)</code> entry point, clearing the JetBrains Marketplace "internal API usage" warning.</li>
@@ -84,6 +88,7 @@
                 instance="com.moraouf.copyproblems.CopyProblemsConfigurable"
                 id="com.moraouf.copyproblems.settings"
                 displayName="Copy All Problems"/>
+        <notificationGroup id="Copy All Problems" displayType="BALLOON"/>
     </extensions>
 
     <idea-version since-build="242" until-build="261.*"/>

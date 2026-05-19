@@ -10,9 +10,16 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 @Service(Service.Level.APP)
 @State(
     name = "CopyProblemsSettings",
-    storages = [Storage("copyProblems.xml")]
+    storages = [Storage("copyProblems.xml")],
 )
 class CopyProblemsSettings : PersistentStateComponent<CopyProblemsSettings.State> {
+
+    enum class NotificationStyle {
+        MODAL,
+        BALLOON,
+        EDITOR_HINT,
+        SILENT,
+    }
 
     data class State(
         // Severity filters — checkboxes in the settings panel.
@@ -29,7 +36,11 @@ class CopyProblemsSettings : PersistentStateComponent<CopyProblemsSettings.State
         // Output format options.
         var includeColumn: Boolean = true,
         var includeSeverityTag: Boolean = true,
-        var sortBySeverityFirst: Boolean = false
+        var sortBySeverityFirst: Boolean = false,
+
+        // How to surface the "copied N problems" / error message after the action runs.
+        // MODAL is the default for backwards compatibility with 1.0.1+ (PyCharm 2025.x balloon issue).
+        var notificationStyle: NotificationStyle = NotificationStyle.MODAL,
     )
 
     private var myState = State()

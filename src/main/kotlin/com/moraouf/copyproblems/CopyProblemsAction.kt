@@ -2,15 +2,20 @@ package com.moraouf.copyproblems
 
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerEx
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
+import com.intellij.codeInsight.hint.HintManager
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Computable
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ide.CopyPasteManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.util.Computable
 import com.intellij.util.Processor
 import java.awt.datatransfer.StringSelection
 
@@ -43,11 +48,7 @@ class CopyProblemsAction : AnAction() {
                 },
             )
         } catch (t: Throwable) {
-            Messages.showErrorDialog(
-                project,
-                "Could not read diagnostics: ${t.message}",
-                "Copy All Problems",
-            )
+            showError(project, editor, "Could not read diagnostics: ${t.message}", settings)
             return
         }
 
@@ -67,10 +68,11 @@ class CopyProblemsAction : AnAction() {
             }
 
         if (filtered.isEmpty()) {
-            Messages.showInfoMessage(
+            showInfo(
                 project,
+                editor,
                 "No problems found in $fileName (after applying severity filters).",
-                "Copy All Problems",
+                settings,
             )
             return
         }
@@ -95,10 +97,11 @@ class CopyProblemsAction : AnAction() {
         }
 
         CopyPasteManager.getInstance().setContents(StringSelection(output))
-        Messages.showInfoMessage(
+        showInfo(
             project,
+            editor,
             "Copied ${filtered.size} problem(s) from $fileName to clipboard.",
-            "Copy All Problems",
+            settings,
         )
     }
 
@@ -116,5 +119,46 @@ class CopyProblemsAction : AnAction() {
         if (sev < HighlightSeverity.INFORMATION.myVal) return false
         if (sev >= HighlightSeverity.WEAK_WARNING.myVal) return true
         return (info.inspectionToolId != null) || (info.problemGroup != null)
+    }
+
+    private fun showInfo(project: Project, editor: Editor, message: String, settings: CopyProblemsSettings) {
+        when (settings.state.notificationStyle) {
+            CopyProblemsSettings.NotificationStyle.MODAL ->
+                Messages.showInfoMessage(project, message, TITLE)
+
+            CopyProblemsSettings.NotificationStyle.BALLOON ->
+                NotificationGroupManager.getInstance()
+                    .getNotificationGroup(NOTIFICATION_GROUP)
+                    .createNotification(message, NotificationType.INFORMATION)
+                    .notify(project)
+
+            CopyProblemsSettings.NotificationStyle.EDITOR_HINT ->
+                HintManager.getInstance().showInformationHint(editor, message)
+
+            CopyProblemsSettings.NotificationStyle.SILENT -> Unit
+        }
+    }
+
+    private fun showError(project: Project, editor: Editor, message: String, settings: CopyProblemsSettings) {
+        when (settings.state.notificationStyle) {
+            CopyProblemsSettings.NotificationStyle.MODAL ->
+                Messages.showErrorDialog(project, message, TITLE)
+
+            CopyProblemsSettings.NotificationStyle.BALLOON ->
+                NotificationGroupManager.getInstance()
+                    .getNotificationGroup(NOTIFICATION_GROUP)
+                    .createNotification(message, NotificationType.ERROR)
+                    .notify(project)
+
+            CopyProblemsSettings.NotificationStyle.EDITOR_HINT ->
+                HintManager.getInstance().showErrorHint(editor, message)
+
+            CopyProblemsSettings.NotificationStyle.SILENT -> Unit
+        }
+    }
+
+    private companion object {
+        const val TITLE = "Copy All Problems"
+        const val NOTIFICATION_GROUP = "Copy All Problems"
     }
 }

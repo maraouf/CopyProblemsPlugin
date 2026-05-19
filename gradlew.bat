@@ -45,13 +45,35 @@ set JAVA_EXE=java.exe
 %JAVA_EXE% -version >NUL 2>&1
 if %ERRORLEVEL% equ 0 goto execute
 
+@rem JAVA_HOME unset and no java on PATH — probe well-known install locations.
+@rem Order: IntelliJ-managed .jdks first (project-correct JBR for this IDEA plugin),
+@rem then Gradle toolchain cache, then bundled JBRs, then system JDK installs.
+call :findJdkChild "%USERPROFILE%\.jdks"
+if defined JAVA_HOME goto findJavaFromJavaHome
+call :findJdkChild "%USERPROFILE%\.gradle\jdks"
+if defined JAVA_HOME goto findJavaFromJavaHome
+call :findJbrChild "%ProgramFiles%\JetBrains"
+if defined JAVA_HOME goto findJavaFromJavaHome
+call :findJdkChild "%ProgramFiles%\Eclipse Adoptium"
+if defined JAVA_HOME goto findJavaFromJavaHome
+call :findJdkChild "%ProgramFiles%\Java"
+if defined JAVA_HOME goto findJavaFromJavaHome
+call :findJdkChild "%ProgramFiles%\Microsoft"
+if defined JAVA_HOME goto findJavaFromJavaHome
+call :findJdkChild "%ProgramFiles%\BellSoft"
+if defined JAVA_HOME goto findJavaFromJavaHome
+call :findJdkChild "%ProgramFiles%\Amazon Corretto"
+if defined JAVA_HOME goto findJavaFromJavaHome
+call :findJdkChild "%ProgramFiles%\Zulu"
+if defined JAVA_HOME goto findJavaFromJavaHome
+
 echo. 1>&2
 echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH. 1>&2
 echo. 1>&2
 echo Please set the JAVA_HOME variable in your environment to match the 1>&2
 echo location of your Java installation. 1>&2
 
-"%COMSPEC%" /c exit 1
+exit /b 1
 
 :findJavaFromJavaHome
 set JAVA_HOME=%JAVA_HOME:"=%
@@ -65,7 +87,29 @@ echo. 1>&2
 echo Please set the JAVA_HOME variable in your environment to match the 1>&2
 echo location of your Java installation. 1>&2
 
-"%COMSPEC%" /c exit 1
+exit /b 1
+
+@rem Pick the lexically-newest child of %~1 that has bin\java.exe; set JAVA_HOME to it.
+:findJdkChild
+if not exist "%~1" exit /b 0
+for /f "delims=" %%j in ('dir /b /ad /o-n "%~1" 2^>nul') do (
+  if exist "%~1\%%j\bin\java.exe" (
+    set "JAVA_HOME=%~1\%%j"
+    exit /b 0
+  )
+)
+exit /b 0
+
+@rem JetBrains IDE installs nest java at <IDE>\jbr\bin\java.exe; pick the lexically-newest IDE.
+:findJbrChild
+if not exist "%~1" exit /b 0
+for /f "delims=" %%i in ('dir /b /ad /o-n "%~1" 2^>nul') do (
+  if exist "%~1\%%i\jbr\bin\java.exe" (
+    set "JAVA_HOME=%~1\%%i\jbr"
+    exit /b 0
+  )
+)
+exit /b 0
 
 :execute
 @rem Setup the command line
