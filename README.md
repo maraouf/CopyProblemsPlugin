@@ -26,8 +26,16 @@ beszel.py:103:1 [WEAK_WARNING] Function 'bar' may be 'static'
 
 ## Settings
 
-**Settings → Tools → Copy All Problems** — toggle which severities are included
-and how each line is formatted.
+**Settings → Tools → Copy All Problems** — three groups of options:
+
+- **Severity filters** — toggle which severities are included (ERROR, WARNING,
+  WEAK WARNING, INFORMATION, GRAMMAR_ERROR, TYPO, SERVER_PROBLEM,
+  STYLE_SUGGESTION), plus a catch-all for any future or custom severity.
+- **Output format** — include the column number, include the `[SEVERITY]` tag,
+  and/or sort by severity (errors first) before line.
+- **Notification style** — how the result is reported after the action runs:
+  modal popup with OK (default), balloon notification (auto-dismisses in the
+  IDE corner), editor hint near the caret, or silent (no notification at all).
 
 ![Settings panel](docs/screenshots/settings-panel.png)
 
