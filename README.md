@@ -19,9 +19,9 @@ Works in any IntelliJ-platform IDE: IntelliJ IDEA, PyCharm (Community and Profes
 ## Output format
 
 ```
-beszel.py:42:5 [WARNING] Unresolved reference 'foo'
-beszel.py:87:12 [ERROR] Expected type 'int', got 'str' instead
-beszel.py:103:1 [WEAK_WARNING] Function 'bar' may be 'static'
+src/example.py:42:5 [WARNING] Unresolved reference 'foo'
+src/example.py:87:12 [ERROR] Expected type 'int', got 'str' instead
+src/example.py:103:1 [WEAK_WARNING] Function 'bar' may be 'static'
 ```
 
 ![Output example](docs/screenshots/output-example.png)

@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 // Force jackson off the buildscript classpath onto the patched line. jackson-core 2.20.2 arrives
 // transitively via the intellij-platform Gradle plugin and trips a Dependabot DoS alert
@@ -59,6 +60,17 @@ java {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_17
+        // Pin language/API to 1.8 even though the compiler is 2.1.0. The plugin runs against the IDE's
+        // OWN bundled kotlin-stdlib (1.7.x on the 222/223 floor — see kotlin.stdlib.default.dependency
+        // in gradle.properties), not a stdlib we ship. The default 2.x language version makes the
+        // compiler emit the stabilized enum `entries` member, which references kotlin.enums.EnumEntries
+        // / EnumEntriesKt — a package added only in stdlib 1.9, absent at runtime on the older IDEs. That
+        // is the "Package 'kotlin.enums' is not found" verifier failure / runtime NoClassDefFoundError.
+        // EnumEntries is a 1.9 language feature, so 1.8 suppresses its generation; 1.8 is also the lowest
+        // version the 2.1.0 compiler accepts. No code uses `.entries` (only individual constants and
+        // exhaustive `when`s), so nothing depends on it. Re-check if the platform floor / compiler moves.
+        apiVersion = KotlinVersion.KOTLIN_1_8
+        languageVersion = KotlinVersion.KOTLIN_1_8
     }
 }
 
