@@ -22,6 +22,7 @@
         <b>1.0.12</b>
         <ul>
             <li>Problem locations are now reported as a <b>project-relative path</b> (e.g. <code>src/main/kotlin/Foo.kt:42:5</code>) instead of just the file name, so files that share a name across different directories are no longer ambiguous. Files outside the project fall back to the plain file name.</li>
+            <li>Broadened IDE compatibility: the plugin now installs on IntelliJ-platform IDEs back to <b>2022.2</b> (build 222), not just 2024.2+. It is built to Java 17 bytecode, so a single build runs across 2022.2 through 2026.1.</li>
             <li>Updated build-time dependencies to patched versions to clear security advisories. No change to the shipped plugin.</li>
         </ul>
         <b>1.0.11</b>
@@ -96,7 +97,7 @@
         <notificationGroup id="Copy All Problems" displayType="BALLOON"/>
     </extensions>
 
-    <idea-version since-build="242" until-build="261.*"/>
+    <idea-version since-build="222" until-build="261.*"/>
 
     <actions>
         <action id="moraouf.CopyProblemsAction"

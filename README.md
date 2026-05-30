@@ -8,6 +8,8 @@
 
 Works in any IntelliJ-platform IDE: IntelliJ IDEA, PyCharm (Community and Professional), WebStorm, GoLand, RubyMine, CLion, etc.
 
+**Compatibility:** IntelliJ Platform **2022.2 through 2026.1** (builds `222`–`261.*`). The plugin ships as Java 17 bytecode, so a single build runs on every IDE in that range.
+
 **Install from JetBrains Marketplace:**
 [plugins.jetbrains.com/plugin/31816-copy-all-problems](https://plugins.jetbrains.com/plugin/31816-copy-all-problems)
 
@@ -59,7 +61,7 @@ After installing the plugin (see below):
 
 ## Build from source
 
-You need a JDK 21 on your PATH (the Gradle toolchain pins JDK 21).
+You need a JDK 21 on your PATH (the Gradle toolchain pins JDK 21). The plugin is compiled to Java 17 bytecode so it runs on IDEs back to 2022.2.
 
 ```bash
 # From the project root:
