@@ -24,8 +24,6 @@ src/example.py:87:12 [ERROR] Expected type 'int', got 'str' instead
 src/example.py:103:1 [WEAK_WARNING] Function 'bar' may be 'static'
 ```
 
-![Output example](docs/screenshots/output-example.png)
-
 ## Settings
 
 **Settings → Tools → Copy All Problems** — three groups of options:
