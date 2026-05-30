@@ -50,14 +50,16 @@ After installing the plugin (see below):
     - Right-click anywhere in the editor → **Copy All Problems with Line Numbers**
     - Or press **Ctrl+Shift+Alt+P** (Windows/Linux) / **⌘+Shift+Alt+P** (Mac)
     - Or **Tools → Copy All Problems with Line Numbers**
-4. A balloon notification confirms how many problems were copied.
+4. By default a modal popup confirms how many problems were copied (you can
+   switch this to a balloon, an editor hint, or silent under
+   **Settings → Tools → Copy All Problems → Notification style**).
 5. Paste anywhere.
 
 ![Editor context menu](docs/screenshots/editor-context-menu.png)
 
 ## Build from source
 
-You need a JDK 17+ on your PATH.
+You need a JDK 21 on your PATH (the Gradle toolchain pins JDK 21).
 
 ```bash
 # From the project root:
@@ -65,10 +67,11 @@ You need a JDK 17+ on your PATH.
 gradlew.bat buildPlugin         # Windows
 ```
 
-The plugin zip will appear at:
+The plugin zip will appear at (the version follows the `version` in
+`build.gradle.kts`):
 
 ```
-build/distributions/copy-problems-1.0.0.zip
+dist/copy-problems-1.0.12.zip
 ```
 
 ## Install in your IDE
@@ -122,9 +125,15 @@ copy-problems-plugin/
 ├── gradle/wrapper/gradle-wrapper.properties            # Wrapper config
 ├── src/main/
 │   ├── kotlin/com/moraouf/copyproblems/
-│   │   └── CopyProblemsAction.kt                       # The action
-│   └── resources/META-INF/
-│       └── plugin.xml                                  # Plugin descriptor
+│   │   ├── CopyProblemsAction.kt                       # The action
+│   │   ├── CopyProblemsSettings.kt                     # Persistent settings (app-level service)
+│   │   └── CopyProblemsConfigurable.kt                 # Settings → Tools panel
+│   └── resources/
+│       ├── META-INF/
+│       │   ├── plugin.xml                              # Plugin descriptor
+│       │   ├── pluginIcon.svg, pluginIcon_dark.svg     # Marketplace / plugins-panel icon
+│       └── icons/
+│           └── copyProblems.svg, copyProblems_dark.svg # In-IDE action icon
 └── README.md                                           # This file
 ```
 

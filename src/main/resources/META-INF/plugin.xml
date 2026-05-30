@@ -1,14 +1,14 @@
 <idea-plugin>
     <id>com.moraouf.copyproblems</id>
     <name>Copy All Problems</name>
-    <version>1.0.11</version>
+    <version>1.0.12</version>
     <vendor email="me@moraouf.com" url="https://moraouf.com">Mohamed Abdelraouf</vendor>
 
     <description><![CDATA[
         Adds an action to copy every diagnostic (errors, warnings, weak warnings, info)
         for the currently active file to the clipboard, one per line, formatted as:
         <br/><br/>
-        <code>filename.py:42:5 [WARNING] Unresolved reference 'foo'</code>
+        <code>src/app/main.py:42:5 [WARNING] Unresolved reference 'foo'</code>
         <br/><br/>
         Useful when you need to paste a file's full problem list into an external tool
         (chat, ticket, code review) and the standard Problems window copy doesn't
@@ -19,6 +19,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.12</b>
+        <ul>
+            <li>Problem locations are now reported as a <b>project-relative path</b> (e.g. <code>src/main/kotlin/Foo.kt:42:5</code>) instead of just the file name, so files that share a name across different directories are no longer ambiguous. Files outside the project fall back to the plain file name.</li>
+            <li>Updated build-time dependencies to patched versions to clear security advisories. No change to the shipped plugin.</li>
+        </ul>
         <b>1.0.11</b>
         <ul>
             <li>New <b>Notification style</b> setting (Settings &rarr; Tools &rarr; Copy All Problems): choose how the result is reported &mdash; modal popup with OK (default, unchanged from 1.0.1+), balloon notification, editor hint near the caret, or silent (no notification at all). Pick a non-modal style to skip the OK click.</li>

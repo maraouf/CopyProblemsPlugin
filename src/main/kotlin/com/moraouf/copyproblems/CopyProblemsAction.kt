@@ -14,8 +14,10 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Computable
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.util.Processor
 import java.awt.datatransfer.StringSelection
 
@@ -27,6 +29,18 @@ class CopyProblemsAction : AnAction() {
         val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return
         val document = editor.document
         val fileName = psiFile.name
+        // Path relative to the project root for the clipboard output — disambiguates files that share
+        // a name across directories. '/' keeps it stable across OSes. Files outside the project root
+        // (library sources, scratch files) have no relative path, so fall back to the bare name.
+        val displayPath = run {
+            val virtualFile = psiFile.virtualFile
+            val baseDir = project.guessProjectDir()
+            if (virtualFile != null && baseDir != null) {
+                VfsUtilCore.getRelativePath(virtualFile, baseDir, '/') ?: fileName
+            } else {
+                fileName
+            }
+        }
         val settings = CopyProblemsSettings.getInstance()
 
         val highlights = try {
@@ -84,7 +98,7 @@ class CopyProblemsAction : AnAction() {
             for (info in filtered) {
                 val offset = info.startOffset
                 val line = document.getLineNumber(offset) + 1
-                append(fileName).append(':').append(line)
+                append(displayPath).append(':').append(line)
                 if (includeColumn) {
                     val col = (offset - document.getLineStartOffset(line - 1)) + 1
                     append(':').append(col)
