@@ -38,6 +38,15 @@ class CopyProblemsSettings : PersistentStateComponent<CopyProblemsSettings.State
         var includeSeverityTag: Boolean = true,
         var sortBySeverityFirst: Boolean = false,
 
+        // For files that live outside the project root (library sources, scratch files) there is no
+        // project-relative path. When true, emit the full absolute path; when false, just the file name.
+        var fullPathForExternalFiles: Boolean = false,
+
+        // Behavior options.
+        // When true, reformat the file (the IDE "Reformat Code" action) before collecting
+        // diagnostics, so whitespace/formatting warnings are resolved and excluded from the copy.
+        var reformatBeforeCopy: Boolean = false,
+
         // How to surface the "copied N problems" / error message after the action runs.
         // MODAL is the default for backwards compatibility with 1.0.1+ (PyCharm 2025.x balloon issue).
         var notificationStyle: NotificationStyle = NotificationStyle.MODAL,

@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.moraouf.copyproblems</id>
     <name>Copy All Problems</name>
-    <version>1.0.12</version>
+    <version>1.0.13</version>
     <vendor email="me@moraouf.com" url="https://moraouf.com">Mohamed Abdelraouf</vendor>
 
     <description><![CDATA[
@@ -19,6 +19,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.13</b>
+        <ul>
+            <li>New <b>Reformat before copying</b> option (Settings &rarr; Tools &rarr; Copy All Problems &rarr; Behavior): when enabled, the file is reformatted (the IDE "Reformat Code" action) before diagnostics are collected, so whitespace/formatting warnings are fixed and excluded from the copied list. Off by default &mdash; the normal behavior is unchanged.</li>
+            <li>New <b>full path for files outside the project</b> option: for files with no project-relative path (library sources, scratch files), choose between the bare file name (default) and the full absolute path.</li>
+        </ul>
         <b>1.0.12</b>
         <ul>
             <li>Problem locations are now reported as a <b>project-relative path</b> (e.g. <code>src/main/kotlin/Foo.kt:42:5</code>) instead of just the file name, so files that share a name across different directories are no longer ambiguous. Files outside the project fall back to the plain file name.</li>

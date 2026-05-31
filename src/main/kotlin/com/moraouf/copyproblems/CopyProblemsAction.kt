@@ -1,5 +1,6 @@
 package com.moraouf.copyproblems
 
+import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerEx
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.codeInsight.hint.HintManager
@@ -15,6 +16,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.vfs.VfsUtilCore
@@ -29,19 +31,36 @@ class CopyProblemsAction : AnAction() {
         val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return
         val document = editor.document
         val fileName = psiFile.name
+        val settings = CopyProblemsSettings.getInstance()
         // Path relative to the project root for the clipboard output — disambiguates files that share
         // a name across directories. '/' keeps it stable across OSes. Files outside the project root
-        // (library sources, scratch files) have no relative path, so fall back to the bare name.
+        // (library sources, scratch files) have no relative path; for those fall back to either the
+        // full absolute path or the bare name, per the fullPathForExternalFiles setting.
         val displayPath = run {
             val virtualFile = psiFile.virtualFile
             val baseDir = project.guessProjectDir()
-            if (virtualFile != null && baseDir != null) {
-                VfsUtilCore.getRelativePath(virtualFile, baseDir, '/') ?: fileName
+            val relativePath = if (virtualFile != null && baseDir != null) {
+                VfsUtilCore.getRelativePath(virtualFile, baseDir, '/')
             } else {
-                fileName
+                null
+            }
+            relativePath
+                ?: if (settings.state.fullPathForExternalFiles && virtualFile != null) virtualFile.path else fileName
+        }
+
+        // Optionally reformat the file first so whitespace/formatting warnings are fixed and
+        // therefore don't show up in the copied list. Deleting the offending whitespace removes
+        // its highlighter ranges, so the read below already reflects the cleaned-up file.
+        if (settings.state.reformatBeforeCopy) {
+            try {
+                PsiDocumentManager.getInstance(project).commitDocument(document)
+                ReformatCodeProcessor(psiFile, false).run()
+                PsiDocumentManager.getInstance(project).commitDocument(document)
+            } catch (t: Throwable) {
+                showError(project, editor, "Could not reformat $fileName: ${t.message}", settings)
+                return
             }
         }
-        val settings = CopyProblemsSettings.getInstance()
 
         val highlights = try {
             ApplicationManager.getApplication().runReadAction(

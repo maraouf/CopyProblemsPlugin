@@ -28,6 +28,11 @@ class CopyProblemsConfigurable : Configurable {
     private val cbIncludeColumn = JBCheckBox("Include column number (line:col vs. line only)")
     private val cbIncludeSeverityTag = JBCheckBox("Include [SEVERITY] tag in each line")
     private val cbSortBySeverityFirst = JBCheckBox("Sort by severity first (errors before warnings), then by line")
+    private val cbFullPathForExternalFiles =
+        JBCheckBox("For files outside the project, use the full absolute path (otherwise file name only)")
+
+    private val cbReformatBeforeCopy =
+        JBCheckBox("Reformat the file (Reformat Code) before copying, to clear whitespace/formatting warnings")
 
     private val rbModal = JBRadioButton("Modal popup with OK button")
     private val rbBalloon = JBRadioButton("Balloon notification (auto-dismisses in IDE corner)")
@@ -51,6 +56,11 @@ class CopyProblemsConfigurable : Configurable {
         CheckboxBinding(cbIncludeColumn, { it.includeColumn }) { s, v -> s.includeColumn = v },
         CheckboxBinding(cbIncludeSeverityTag, { it.includeSeverityTag }) { s, v -> s.includeSeverityTag = v },
         CheckboxBinding(cbSortBySeverityFirst, { it.sortBySeverityFirst }) { s, v -> s.sortBySeverityFirst = v },
+        CheckboxBinding(
+            cbFullPathForExternalFiles,
+            { it.fullPathForExternalFiles },
+        ) { s, v -> s.fullPathForExternalFiles = v },
+        CheckboxBinding(cbReformatBeforeCopy, { it.reformatBeforeCopy }) { s, v -> s.reformatBeforeCopy = v },
     )
 
     init {
@@ -87,6 +97,12 @@ class CopyProblemsConfigurable : Configurable {
         panel.add(cbIncludeColumn)
         panel.add(cbIncludeSeverityTag)
         panel.add(cbSortBySeverityFirst)
+        panel.add(cbFullPathForExternalFiles)
+
+        panel.add(Box.createVerticalStrut(16))
+        panel.add(JBLabel("<html><b>Behavior</b></html>"))
+        panel.add(Box.createVerticalStrut(8))
+        panel.add(cbReformatBeforeCopy)
 
         panel.add(Box.createVerticalStrut(16))
         panel.add(JBLabel("<html><b>Notification style</b> &mdash; how the result is reported:</html>"))
