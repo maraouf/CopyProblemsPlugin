@@ -57,7 +57,17 @@ java {
 // 17 bytecode also runs on the JBR 21 of 2024.2+, so one build spans the whole 222–261.* range. Set on
 // the compile tasks rather than via kotlin.jvmToolchain, because jvmToolchain couples the target to the
 // compiler JDK and forces v65 (Java 21) bytecode that won't load on JBR 17 — verified the hard way.
+// Expose sample/ as a Kotlin source root so the IDE gives SampleWithProblems.kt full code analysis.
+// Outside a source root the Kotlin plugin turns code insight OFF (no module classpath to resolve
+// against), which is why the demo file showed zero problems. It joins the main source set so it
+// inherits the platform's bundled kotlin-stdlib on the analysis classpath; the file is excluded from
+// the compile task below, since it deliberately contains errors and must not break the build or ship.
+kotlin {
+    sourceSets["main"].kotlin.srcDir("sample")
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    exclude("**/SampleWithProblems.kt")
     compilerOptions {
         jvmTarget = JvmTarget.JVM_17
         // Pin language/API to 1.8 even though the compiler is 2.1.0. The plugin runs against the IDE's

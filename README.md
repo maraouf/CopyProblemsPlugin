@@ -19,9 +19,9 @@ Works in any IntelliJ-platform IDE: IntelliJ IDEA, PyCharm (Community and Profes
 ## Output format
 
 ```
-src/example.py:42:5 [WARNING] Unresolved reference 'foo'
-src/example.py:87:12 [ERROR] Expected type 'int', got 'str' instead
-src/example.py:103:1 [WEAK_WARNING] Function 'bar' may be 'static'
+sample/SampleWithProblems.kt:7:1 [WARNING] Unused import directive
+sample/SampleWithProblems.kt:10:7 [WARNING] Class "SampleWithProblems" is never used
+sample/SampleWithProblems.kt:13:17 [WARNING] Property "unusedField" is never used
 ```
 
 ## Settings

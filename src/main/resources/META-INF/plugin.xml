@@ -8,7 +8,11 @@
         Adds an action to copy every diagnostic (errors, warnings, weak warnings, info)
         for the currently active file to the clipboard, one per line, formatted as:
         <br/><br/>
-        <code>src/app/main.py:42:5 [WARNING] Unresolved reference 'foo'</code>
+        <code>
+        sample/SampleWithProblems.kt:7:1 [WARNING] Unused import directive
+        sample/SampleWithProblems.kt:10:7 [WARNING] Class "SampleWithProblems" is never used
+        sample/SampleWithProblems.kt:13:17 [WARNING] Property "unusedField" is never used
+        </code>
         <br/><br/>
         Useful when you need to paste a file's full problem list into an external tool
         (chat, ticket, code review) and the standard Problems window copy doesn't
