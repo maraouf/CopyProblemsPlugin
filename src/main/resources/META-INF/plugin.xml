@@ -23,6 +23,7 @@
         <ul>
             <li>New <b>Reformat before copying</b> option (Settings &rarr; Tools &rarr; Copy All Problems &rarr; Behavior): when enabled, the file is reformatted (the IDE "Reformat Code" action) before diagnostics are collected, so whitespace/formatting warnings are fixed and excluded from the copied list. Off by default &mdash; the normal behavior is unchanged.</li>
             <li>New <b>full path for files outside the project</b> option: for files with no project-relative path (library sources, scratch files), choose between the bare file name (default) and the full absolute path.</li>
+            <li>The settings panel (Settings &rarr; Tools &rarr; Copy All Problems) now shows the installed plugin <b>version</b> in its footer.</li>
         </ul>
         <b>1.0.12</b>
         <ul>
