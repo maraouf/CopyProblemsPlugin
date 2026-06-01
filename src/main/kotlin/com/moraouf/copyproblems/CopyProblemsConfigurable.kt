@@ -1,6 +1,6 @@
 package com.moraouf.copyproblems
 
-import com.intellij.ide.plugins.PluginManagerCore
+import com.intellij.ide.plugins.PluginManager
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.options.Configurable
 import com.intellij.ui.components.JBCheckBox
@@ -115,7 +115,7 @@ class CopyProblemsConfigurable : Configurable {
         panel.add(rbSilent)
 
         panel.add(Box.createVerticalStrut(16))
-        val version = PluginManagerCore.getPlugin(PluginId.getId("com.moraouf.copyproblems"))?.version
+        val version = PluginManager.getInstance().findEnabledPlugin(PluginId.getId("com.moraouf.copyproblems"))?.version
         val versionText = if (version != null) "Copy All Problems v$version" else "Copy All Problems"
         val versionLabel = JBLabel("<html><i>$versionText</i></html>")
         versionLabel.foreground = JBUI.CurrentTheme.ContextHelp.FOREGROUND
