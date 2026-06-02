@@ -108,10 +108,29 @@ class CopyProblemsAction : AnAction() {
                 },
             )
             Alarm(Alarm.ThreadToUse.SWING_THREAD, lifetime).addRequest(finish, REANALYSIS_TIMEOUT_MS)
-            DaemonCodeAnalyzer.getInstance(project).restart(psiFile)
+            restartDaemon(DaemonCodeAnalyzer.getInstance(project), psiFile)
         } catch (_: Throwable) {
             // If we couldn't wire up the wait, fall back to copying whatever is current.
             finish()
+        }
+    }
+
+    /**
+     * Force the daemon to re-highlight [psiFile]. 2026.1 deprecated the single-argument
+     * `restart(PsiFile)` in favor of a reason-carrying `restart(PsiFile, Object)` overload that
+     * doesn't exist on older platforms (222–251). We call whichever is present reflectively so a
+     * single build spans the whole supported range and no deprecated symbol is referenced in the
+     * bytecode (which keeps the plugin verifier quiet on the newer IDE).
+     */
+    private fun restartDaemon(daemon: DaemonCodeAnalyzer, psiFile: PsiFile) {
+        try {
+            daemon.javaClass
+                .getMethod("restart", PsiFile::class.java, Any::class.java)
+                .invoke(daemon, psiFile, "Copy All Problems: reanalyze after reformat")
+        } catch (_: NoSuchMethodException) {
+            daemon.javaClass
+                .getMethod("restart", PsiFile::class.java)
+                .invoke(daemon, psiFile)
         }
     }
 
