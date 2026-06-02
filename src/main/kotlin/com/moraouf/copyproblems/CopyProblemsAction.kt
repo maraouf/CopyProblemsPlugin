@@ -1,6 +1,7 @@
 package com.moraouf.copyproblems
 
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerEx
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.codeInsight.hint.HintManager
@@ -12,16 +13,21 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.PsiFile
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.util.Alarm
 import com.intellij.util.Processor
 import java.awt.datatransfer.StringSelection
+import java.util.concurrent.atomic.AtomicBoolean
 
 class CopyProblemsAction : AnAction() {
 
@@ -49,8 +55,11 @@ class CopyProblemsAction : AnAction() {
         }
 
         // Optionally reformat the file first so whitespace/formatting warnings are fixed and
-        // therefore don't show up in the copied list. Deleting the offending whitespace removes
-        // its highlighter ranges, so the read below already reflects the cleaned-up file.
+        // therefore don't show up in the copied list. Reformatting edits the document, but the
+        // diagnostics the daemon has *already published* still describe the pre-reformat text — the
+        // whitespace/formatting warnings the reformat just resolved keep sitting in the markup model
+        // until the daemon re-analyzes. So we can't read highlights right after reformatting; we
+        // restart the daemon and copy once it reports back (see scheduleCopyAfterReanalysis).
         if (settings.state.reformatBeforeCopy) {
             try {
                 PsiDocumentManager.getInstance(project).commitDocument(document)
@@ -60,8 +69,60 @@ class CopyProblemsAction : AnAction() {
                 showError(project, editor, "Could not reformat $fileName: ${t.message}", settings)
                 return
             }
+            scheduleCopyAfterReanalysis(project, editor, psiFile, document, displayPath, fileName, settings)
+            return
         }
 
+        collectAndCopy(project, editor, document, displayPath, fileName, settings)
+    }
+
+    /**
+     * After a reformat the daemon's published highlights are stale — they still include the
+     * whitespace/formatting warnings the reformat resolved. We can't wait synchronously (the daemon
+     * publishes its results on the EDT, so blocking it would deadlock), so restart highlighting and
+     * perform the copy from the daemon-finished listener. A timeout fallback guarantees the copy
+     * still happens if highlighting never reports (e.g. unavailable for this file type).
+     */
+    private fun scheduleCopyAfterReanalysis(
+        project: Project,
+        editor: Editor,
+        psiFile: PsiFile,
+        document: Document,
+        displayPath: String,
+        fileName: String,
+        settings: CopyProblemsSettings,
+    ) {
+        val lifetime = Disposer.newDisposable("CopyProblems.reanalysis")
+        val done = AtomicBoolean(false)
+        val finish = {
+            if (done.compareAndSet(false, true)) {
+                Disposer.dispose(lifetime)
+                collectAndCopy(project, editor, document, displayPath, fileName, settings)
+            }
+        }
+        try {
+            project.messageBus.connect(lifetime).subscribe(
+                DaemonCodeAnalyzer.DAEMON_EVENT_TOPIC,
+                object : DaemonCodeAnalyzer.DaemonListener {
+                    override fun daemonFinished() = finish()
+                },
+            )
+            Alarm(Alarm.ThreadToUse.SWING_THREAD, lifetime).addRequest(finish, REANALYSIS_TIMEOUT_MS)
+            DaemonCodeAnalyzer.getInstance(project).restart(psiFile)
+        } catch (_: Throwable) {
+            // If we couldn't wire up the wait, fall back to copying whatever is current.
+            finish()
+        }
+    }
+
+    private fun collectAndCopy(
+        project: Project,
+        editor: Editor,
+        document: Document,
+        displayPath: String,
+        fileName: String,
+        settings: CopyProblemsSettings,
+    ) {
         val highlights = try {
             ApplicationManager.getApplication().runReadAction(
                 Computable<List<HighlightInfo>> {
@@ -193,5 +254,9 @@ class CopyProblemsAction : AnAction() {
     private companion object {
         const val TITLE = "Copy All Problems"
         const val NOTIFICATION_GROUP = "Copy All Problems"
+
+        // Upper bound on how long we wait for the daemon to re-highlight after a reformat before
+        // copying whatever is current. Re-analysis normally reports back well under this.
+        const val REANALYSIS_TIMEOUT_MS = 5000
     }
 }
