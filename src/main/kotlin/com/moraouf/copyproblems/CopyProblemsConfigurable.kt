@@ -3,10 +3,15 @@ package com.moraouf.copyproblems
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.ui.ComboBox
+import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBRadioButton
+import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.JBUI
+import java.awt.Component
+import java.awt.FlowLayout
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.ButtonGroup
@@ -32,9 +37,21 @@ class CopyProblemsConfigurable : Configurable {
     private val cbSortBySeverityFirst = JBCheckBox("Sort by severity first (errors before warnings), then by line")
     private val cbFullPathForExternalFiles =
         JBCheckBox("For files outside the project, use the full absolute path (otherwise file name only)")
+    private val cbIncludeCodeContext =
+        JBCheckBox("Include the offending source line as context (indented line / Code column / code field)")
+
+    private val aiPromptHeaderField = JBTextField(36)
 
     private val cbReformatBeforeCopy =
         JBCheckBox("Reformat the file (Reformat Code) before copying, to clear whitespace/formatting warnings")
+
+    private val scopeCombo = ComboBox(CopyProblemsSettings.CopyScope.values()).apply {
+        renderer = SimpleListCellRenderer.create("") { scopeLabel(it) }
+    }
+
+    private val formatCombo = ComboBox(CopyProblemsSettings.OutputFormat.values()).apply {
+        renderer = SimpleListCellRenderer.create("") { formatLabel(it) }
+    }
 
     private val rbModal = JBRadioButton("Modal popup with OK button")
     private val rbBalloon = JBRadioButton("Balloon notification (auto-dismisses in IDE corner)")
@@ -63,6 +80,7 @@ class CopyProblemsConfigurable : Configurable {
             { it.fullPathForExternalFiles },
         ) { s, v -> s.fullPathForExternalFiles = v },
         CheckboxBinding(cbReformatBeforeCopy, { it.reformatBeforeCopy }) { s, v -> s.reformatBeforeCopy = v },
+        CheckboxBinding(cbIncludeCodeContext, { it.includeCodeContext }) { s, v -> s.includeCodeContext = v },
     )
 
     init {
@@ -80,6 +98,21 @@ class CopyProblemsConfigurable : Configurable {
         panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
         panel.border = JBUI.Borders.empty(10)
 
+        panel.add(JBLabel("<html><b>Default scope</b> &mdash; which files the action copies problems from:</html>"))
+        panel.add(Box.createVerticalStrut(8))
+        val scopeRow = JPanel(FlowLayout(FlowLayout.LEFT, 0, 0))
+        scopeRow.alignmentX = Component.LEFT_ALIGNMENT
+        scopeRow.add(scopeCombo)
+        panel.add(scopeRow)
+        panel.add(Box.createVerticalStrut(4))
+        panel.add(
+            JBLabel(
+                "<html><i>Open editors and the active file read already-computed problems; VCS-changed " +
+                    "and directory scopes run analysis (with a progress bar) and report errors/warnings.</i></html>",
+            ).apply { foreground = JBUI.CurrentTheme.ContextHelp.FOREGROUND },
+        )
+
+        panel.add(Box.createVerticalStrut(16))
         panel.add(JBLabel("<html><b>Severity filters</b> &mdash; unchecked severities are skipped:</html>"))
         panel.add(Box.createVerticalStrut(8))
         panel.add(cbError)
@@ -96,10 +129,40 @@ class CopyProblemsConfigurable : Configurable {
         panel.add(Box.createVerticalStrut(16))
         panel.add(JBLabel("<html><b>Output format</b></html>"))
         panel.add(Box.createVerticalStrut(8))
+        val formatRow = JPanel(FlowLayout(FlowLayout.LEFT, 0, 0))
+        formatRow.alignmentX = Component.LEFT_ALIGNMENT
+        formatRow.add(JBLabel("Copy as: "))
+        formatRow.add(formatCombo)
+        panel.add(formatRow)
+        panel.add(Box.createVerticalStrut(8))
         panel.add(cbIncludeColumn)
         panel.add(cbIncludeSeverityTag)
         panel.add(cbSortBySeverityFirst)
         panel.add(cbFullPathForExternalFiles)
+        panel.add(cbIncludeCodeContext)
+        panel.add(Box.createVerticalStrut(4))
+        panel.add(
+            JBLabel(
+                "<html><i>Plain uses all options above. Markdown and JSON always include the path " +
+                    "and severity (so the [SEVERITY] tag option is plain-only) and honor the column option.</i></html>",
+            ).apply { foreground = JBUI.CurrentTheme.ContextHelp.FOREGROUND },
+        )
+
+        panel.add(Box.createVerticalStrut(16))
+        panel.add(JBLabel("<html><b>AI prompt</b> &mdash; header for the <i>Copy All Problems as AI Prompt</i> action:</html>"))
+        panel.add(Box.createVerticalStrut(8))
+        val aiPromptRow = JPanel(FlowLayout(FlowLayout.LEFT, 0, 0))
+        aiPromptRow.alignmentX = Component.LEFT_ALIGNMENT
+        aiPromptRow.add(JBLabel("Instruction: "))
+        aiPromptRow.add(aiPromptHeaderField)
+        panel.add(aiPromptRow)
+        panel.add(Box.createVerticalStrut(4))
+        panel.add(
+            JBLabel(
+                "<html><i>Prepended (followed by a blank line) before the problem list, which still " +
+                    "follows the output format above. Enable “Include the offending source line” for code context.</i></html>",
+            ).apply { foreground = JBUI.CurrentTheme.ContextHelp.FOREGROUND },
+        )
 
         panel.add(Box.createVerticalStrut(16))
         panel.add(JBLabel("<html><b>Behavior</b></html>"))
@@ -127,18 +190,28 @@ class CopyProblemsConfigurable : Configurable {
 
     override fun isModified(): Boolean {
         val s = settings.state
-        return checkboxBindings.any { it.isModified(s) } || (selectedStyle() != s.notificationStyle)
+        return checkboxBindings.any { it.isModified(s) } ||
+            (selectedStyle() != s.notificationStyle) ||
+            (selectedScope() != s.copyScope) ||
+            (selectedFormat() != s.outputFormat) ||
+            (aiPromptHeaderField.text != s.aiPromptHeader)
     }
 
     override fun apply() {
         val s = settings.state
         checkboxBindings.forEach { it.save(s) }
         s.notificationStyle = selectedStyle()
+        s.copyScope = selectedScope()
+        s.outputFormat = selectedFormat()
+        s.aiPromptHeader = aiPromptHeaderField.text
     }
 
     override fun reset() {
         val s = settings.state
         checkboxBindings.forEach { it.load(s) }
+        scopeCombo.selectedItem = s.copyScope
+        formatCombo.selectedItem = s.outputFormat
+        aiPromptHeaderField.text = s.aiPromptHeader
         when (s.notificationStyle) {
             CopyProblemsSettings.NotificationStyle.MODAL -> rbModal.isSelected = true
             CopyProblemsSettings.NotificationStyle.BALLOON -> rbBalloon.isSelected = true
@@ -152,6 +225,27 @@ class CopyProblemsConfigurable : Configurable {
         rbEditorHint.isSelected -> CopyProblemsSettings.NotificationStyle.EDITOR_HINT
         rbSilent.isSelected -> CopyProblemsSettings.NotificationStyle.SILENT
         else -> CopyProblemsSettings.NotificationStyle.MODAL
+    }
+
+    private fun selectedScope(): CopyProblemsSettings.CopyScope =
+        scopeCombo.selectedItem as? CopyProblemsSettings.CopyScope
+            ?: CopyProblemsSettings.CopyScope.ACTIVE_FILE
+
+    private fun scopeLabel(scope: CopyProblemsSettings.CopyScope): String = when (scope) {
+        CopyProblemsSettings.CopyScope.ACTIVE_FILE -> "Active file"
+        CopyProblemsSettings.CopyScope.OPEN_EDITORS -> "All open editors"
+        CopyProblemsSettings.CopyScope.VCS_CHANGED -> "VCS-changed files (git working tree)"
+        CopyProblemsSettings.CopyScope.CURRENT_DIRECTORY -> "Current file's directory (recursive)"
+    }
+
+    private fun selectedFormat(): CopyProblemsSettings.OutputFormat =
+        formatCombo.selectedItem as? CopyProblemsSettings.OutputFormat
+            ?: CopyProblemsSettings.OutputFormat.PLAIN
+
+    private fun formatLabel(format: CopyProblemsSettings.OutputFormat): String = when (format) {
+        CopyProblemsSettings.OutputFormat.PLAIN -> "Plain text (path:line:col [SEVERITY] description)"
+        CopyProblemsSettings.OutputFormat.MARKDOWN_TABLE -> "Markdown table"
+        CopyProblemsSettings.OutputFormat.JSON -> "JSON array"
     }
 
     private class CheckboxBinding(

@@ -21,6 +21,34 @@ class CopyProblemsSettings : PersistentStateComponent<CopyProblemsSettings.State
         SILENT,
     }
 
+    /**
+     * Which files the action collects diagnostics from. ACTIVE_FILE preserves the original
+     * single-file behavior (and is the only scope the "reformat before copy" option applies to);
+     * the others gather multiple files and emit a per-file grouped list. VCS_CHANGED reads the git
+     * working-tree changes via ChangeListManager and is a no-op when the project is not under VCS —
+     * it deliberately does NOT fall back to scanning the whole project. CURRENT_DIRECTORY walks the
+     * active file's directory recursively (project content files only).
+     */
+    enum class CopyScope {
+        ACTIVE_FILE,
+        OPEN_EDITORS,
+        VCS_CHANGED,
+        CURRENT_DIRECTORY,
+    }
+
+    /**
+     * How the collected problems are serialized to the clipboard. PLAIN is the original
+     * one-line-per-problem format (`path:line:col`, an optional severity tag, then the description)
+     * and honors the includeColumn / includeSeverityTag flags. MARKDOWN_TABLE and JSON are
+     * structured: they always carry the path and severity (the includeSeverityTag flag is plain-only)
+     * and honor includeColumn for the column field.
+     */
+    enum class OutputFormat {
+        PLAIN,
+        MARKDOWN_TABLE,
+        JSON,
+    }
+
     data class State(
         // Severity filters — checkboxes in the settings panel.
         var includeError: Boolean = true,
@@ -50,6 +78,21 @@ class CopyProblemsSettings : PersistentStateComponent<CopyProblemsSettings.State
         // How to surface the "copied N problems" / error message after the action runs.
         // MODAL is the default for backwards compatibility with 1.0.1+ (PyCharm 2025.x balloon issue).
         var notificationStyle: NotificationStyle = NotificationStyle.MODAL,
+
+        // Which files the action collects from. Defaults to ACTIVE_FILE so existing behavior and
+        // keymap bindings are unchanged for users who never touch the setting.
+        var copyScope: CopyScope = CopyScope.ACTIVE_FILE,
+
+        // How the result is serialized to the clipboard. Defaults to PLAIN (the original line format).
+        var outputFormat: OutputFormat = OutputFormat.PLAIN,
+
+        // When true, each problem is accompanied by its offending source line (integrated into the
+        // active output format). Applies to every copy, but is most useful with the AI-prompt action.
+        var includeCodeContext: Boolean = false,
+
+        // Instruction text the "Copy as AI Prompt" action prepends before the (format-respecting)
+        // problem list. Editable so users can tailor it to their assistant.
+        var aiPromptHeader: String = "Fix the following diagnostics in my code:",
     )
 
     private var myState = State()

@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.moraouf.copyproblems</id>
     <name>Copy All Problems</name>
-    <version>1.0.13</version>
+    <version>1.0.14</version>
     <vendor email="me@moraouf.com" url="https://moraouf.com">Mohamed Abdelraouf</vendor>
 
     <description><![CDATA[
@@ -18,11 +18,27 @@
         (chat, ticket, code review) and the standard Problems window copy doesn't
         include line numbers in your build.
         <br/><br/>
+        <b>Scope:</b> copy problems from just the active file (default), all open editors,
+        every VCS-changed file in your git working tree, or the active file's directory
+        (recursive) &mdash; selectable under Settings &rarr; Tools &rarr; Copy All Problems.
+        <br/><br/>
+        <b>Formats:</b> copy as plain text, a Markdown table, or a JSON array; or use
+        <i>Copy All Problems as AI Prompt</i> to prepend an instruction header (optionally
+        with each offending source line) for pasting straight into an AI assistant.
+        <br/><br/>
         <b>How to use:</b> right-click in the editor → <i>Copy All Problems with Line Numbers</i>,
         or press <kbd>Ctrl+Shift+Alt+P</kbd> (Windows/Linux) / <kbd>⌘+Shift+Alt+P</kbd> (Mac).
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.14</b>
+        <ul>
+            <li>New <b>Default scope</b> setting (Settings &rarr; Tools &rarr; Copy All Problems): choose which files the action copies problems from &mdash; the <b>active file</b> (default, unchanged), <b>all open editors</b>, <b>VCS-changed files</b> (the git working-tree changes; nothing to scan when the project isn't under version control), or the <b>active file's directory</b> (recursive). Multi-file scopes emit a per-file grouped list with a <code>#&nbsp;path</code> header for each file.</li>
+            <li>Open editors and the active file read already-computed diagnostics; the VCS-changed and directory scopes run analysis on demand (with a cancelable progress bar) and report errors and warnings.</li>
+            <li>New <b>Output format</b> setting: copy the problems as <b>plain text</b> (the original <code>path:line:col [SEVERITY] description</code> lines, default), a <b>Markdown table</b> (pastes cleanly into a PR or issue), or a <b>JSON array</b> of <code>{path, line, col, severity, message}</code> objects (handy for piping into a script or an AI assistant).</li>
+            <li>New <b>Copy All Problems as AI Prompt</b> action (editor right-click / Tools menu / <kbd>Ctrl+Shift+Alt+A</kbd>): copies the problem list (in your chosen output format) prefixed with a customizable instruction header, ready to paste straight into an AI assistant.</li>
+            <li>New <b>Include source-line context</b> option: attaches each problem's offending line of code, integrated into the active format (an extra indented line in plain text, a <code>Code</code> column in Markdown, a <code>code</code> field in JSON). Off by default; especially useful with the AI Prompt action.</li>
+        </ul>
         <b>1.0.13</b>
         <ul>
             <li>New <b>Reformat before copying</b> option (Settings &rarr; Tools &rarr; Copy All Problems &rarr; Behavior): when enabled, the file is reformatted (the IDE "Reformat Code" action) before diagnostics are collected, so whitespace/formatting warnings are fixed and excluded from the copied list. Off by default &mdash; the normal behavior is unchanged.</li>
@@ -120,6 +136,17 @@
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift alt P"/>
             <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta shift alt P"/>
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift alt P"/>
+        </action>
+        <action id="moraouf.CopyProblemsAsAiPromptAction"
+                class="com.moraouf.copyproblems.CopyProblemsAsAiPromptAction"
+                icon="/icons/copyProblems.svg"
+                text="Copy All Problems as AI Prompt"
+                description="Copies diagnostics prefixed with an instruction header, ready to paste into an AI assistant">
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="moraouf.CopyProblemsAction"/>
+            <add-to-group group-id="ToolsMenu" anchor="after" relative-to-action="moraouf.CopyProblemsAction"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift alt A"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta shift alt A"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift alt A"/>
         </action>
     </actions>
 </idea-plugin>
