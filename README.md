@@ -30,11 +30,12 @@ When the scope covers more than one file (open editors, VCS-changed, or a
 directory), the plain output is grouped per file under a `# path` header:
 
 ```
-# src/main/kotlin/Foo.kt
-src/main/kotlin/Foo.kt:7:1 [WARNING] Unused import directive
+# sample/SampleWithProblems.kt
+sample/SampleWithProblems.kt:32:25 [ERROR] Initializer type mismatch: expected 'Int', actual 'String'.
+sample/SampleWithProblems.kt:38:9 [ERROR] Unresolved reference 'doesNotExist'.
 
-# src/main/kotlin/Bar.kt
-src/main/kotlin/Bar.kt:3:5 [ERROR] Unresolved reference: doThing
+# src/main/resources/META-INF/plugin.xml
+src/main/resources/META-INF/plugin.xml:135:30 [WARNING] Extract displayName for i18n
 ```
 
 You can also copy as a **Markdown table**:
@@ -42,8 +43,9 @@ You can also copy as a **Markdown table**:
 ```
 | File | Line | Col | Severity | Description |
 | --- | --- | --- | --- | --- |
-| src/main/kotlin/Foo.kt | 7 | 1 | WARNING | Unused import directive |
-| src/main/kotlin/Bar.kt | 3 | 5 | ERROR | Unresolved reference: doThing |
+| sample/SampleWithProblems.kt | 32 | 25 | ERROR | Initializer type mismatch: expected 'Int', actual 'String'. |
+| sample/SampleWithProblems.kt | 38 | 9 | ERROR | Unresolved reference 'doesNotExist'. |
+| sample/SampleWithProblems.kt | 7 | 1 | WARNING | Unused import directive |
 ```
 
 ![Markdown table output](docs/screenshots/markdown-table-output-example.png)
@@ -52,8 +54,9 @@ You can also copy as a **Markdown table**:
 
 ```json
 [
-  {"path": "src/main/kotlin/Foo.kt", "line": 7, "col": 1, "severity": "WARNING", "message": "Unused import directive"},
-  {"path": "src/main/kotlin/Bar.kt", "line": 3, "col": 5, "severity": "ERROR", "message": "Unresolved reference: doThing"}
+  {"path": "sample/SampleWithProblems.kt", "line": 32, "col": 25, "severity": "ERROR", "message": "Initializer type mismatch: expected 'Int', actual 'String'."},
+  {"path": "sample/SampleWithProblems.kt", "line": 38, "col": 9, "severity": "ERROR", "message": "Unresolved reference 'doesNotExist'."},
+  {"path": "sample/SampleWithProblems.kt", "line": 7, "col": 1, "severity": "WARNING", "message": "Unused import directive"}
 ]
 ```
 
@@ -66,11 +69,11 @@ instruction header, so the clipboard is ready to paste into an AI assistant
 ```
 Fix the following diagnostics in my code:
 
-src/main/kotlin/Foo.kt:7:1 [WARNING] Unused import directive
-    import unused.Thing
+sample/SampleWithProblems.kt:7:1 [WARNING] Unused import directive
+    import java.util.ArrayList
 ```
 
-(The indented `import unused.Thing` line appears when **Include the offending
+(The indented `import java.util.ArrayList` line appears when **Include the offending
 source line as context** is enabled.)
 
 ## Settings
