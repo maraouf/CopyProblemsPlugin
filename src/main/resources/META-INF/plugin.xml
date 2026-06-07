@@ -22,9 +22,22 @@
         every VCS-changed file in your git working tree, or the active file's directory
         (recursive) &mdash; selectable under Settings &rarr; Tools &rarr; Copy All Problems.
         <br/><br/>
-        <b>Formats:</b> copy as plain text, a Markdown table, or a JSON array; or use
-        <i>Copy All Problems as AI Prompt</i> to prepend an instruction header (optionally
-        with each offending source line) for pasting straight into an AI assistant.
+        <b>Formats:</b> copy as plain text, a Markdown table, or a JSON array of
+        <code>{path, line, col, severity, message}</code> objects &mdash; selectable in the same
+        settings panel.
+        <br/><br/>
+        <b>AI prompt:</b> the separate <i>Copy All Problems as AI Prompt</i> action
+        (<kbd>Ctrl+Shift+Alt+A</kbd> / <kbd>⌘+Shift+Alt+A</kbd>) copies the list in your chosen
+        format prefixed with a customizable instruction header, ready to paste straight into an
+        AI assistant.
+        <br/><br/>
+        <b>Source-line context:</b> optionally attach each problem's offending line of code,
+        integrated into the active format (an indented line in plain text, a <code>Code</code>
+        column in Markdown, a <code>code</code> field in JSON) &mdash; off by default, handy with
+        the AI prompt.
+        <br/><br/>
+        <b>Reformat before copying:</b> optionally run the IDE "Reformat Code" action first, so
+        whitespace/formatting warnings are fixed and dropped from the copied list (off by default).
         <br/><br/>
         <b>How to use:</b> right-click in the editor → <i>Copy All Problems with Line Numbers</i>,
         or press <kbd>Ctrl+Shift+Alt+P</kbd> (Windows/Linux) / <kbd>⌘+Shift+Alt+P</kbd> (Mac).

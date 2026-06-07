@@ -1,28 +1,35 @@
-# sample/SampleWithProblems.kt
-sample/SampleWithProblems.kt:32:25 [ERROR] Initializer type mismatch: expected 'Int', actual 'String'.
-sample/SampleWithProblems.kt:38:9 [ERROR] Unresolved reference 'doesNotExist'.
-sample/SampleWithProblems.kt:1:1 [WARNING] Line separators in the current file (\n) differ from the project defaults (\r\n)
-sample/SampleWithProblems.kt:7:1 [WARNING] Unused import directive
-sample/SampleWithProblems.kt:8:1 [WARNING] Unused import directive
-sample/SampleWithProblems.kt:10:7 [WARNING] Class "SampleWithProblems" is never used
-sample/SampleWithProblems.kt:13:17 [WARNING] Property "unusedField" is never used
-sample/SampleWithProblems.kt:16:9 [WARNING] Function "greet" is never used
-sample/SampleWithProblems.kt:16:15 [WARNING] Parameter "name" is never used
-sample/SampleWithProblems.kt:17:13 [WARNING] Unused variable
-sample/SampleWithProblems.kt:17:13 [WARNING] Property "message" is never used
-sample/SampleWithProblems.kt:21:9 [WARNING] Function "compute" is never used
-sample/SampleWithProblems.kt:27:9 [WARNING] Unreachable code
-sample/SampleWithProblems.kt:27:16 [WARNING] Unreachable code
-sample/SampleWithProblems.kt:27:17 [WARNING] Unreachable code
-sample/SampleWithProblems.kt:27:18 [WARNING] Unreachable code
-sample/SampleWithProblems.kt:27:28 [WARNING] Unreachable code
-sample/SampleWithProblems.kt:27:29 [WARNING] Unreachable code
-sample/SampleWithProblems.kt:31:9 [WARNING] Function "broken" is never used
-sample/SampleWithProblems.kt:37:9 [WARNING] Function "callMissing" is never used
-sample/SampleWithProblems.kt:42:9 [WARNING] Function "redundantCheck" is never used
-sample/SampleWithProblems.kt:43:13 [WARNING] Condition is always 'true'.
-sample/SampleWithProblems.kt:49:9 [WARNING] Function "alwaysFalse" is never used
-sample/SampleWithProblems.kt:51:16 [WARNING] Condition 'x == 5' is always true
-sample/SampleWithProblems.kt:51:16 [WARNING] Condition 'x == 5 && x == 6' is always false
-sample/SampleWithProblems.kt:51:26 [WARNING] Condition 'x == 6' is always false when reached
-sample/SampleWithProblems.kt:51:16 [INFORMATION] Expression should use clarifying parentheses
+| File | Line | Col | Severity | Description |
+| --- | --- | --- | --- | --- |
+| sample/SampleWithProblems.kt | 32 | 25 | ERROR | Initializer type mismatch: expected 'Int', actual 'String'. |
+| sample/SampleWithProblems.kt | 38 | 9 | ERROR | Unresolved reference 'doesNotExist'. |
+| sample/SampleWithProblems.kt | 1 | 1 | WARNING | Line separators in the current file (\\n) differ from the project defaults (\\r\\n) |
+| sample/SampleWithProblems.kt | 7 | 1 | WARNING | Unused import directive |
+| sample/SampleWithProblems.kt | 8 | 1 | WARNING | Unused import directive |
+| sample/SampleWithProblems.kt | 10 | 7 | WARNING | Class "SampleWithProblems" is never used |
+| sample/SampleWithProblems.kt | 13 | 17 | WARNING | Property "unusedField" is never used |
+| sample/SampleWithProblems.kt | 16 | 9 | WARNING | Function "greet" is never used |
+| sample/SampleWithProblems.kt | 16 | 15 | WARNING | Parameter "name" is never used |
+| sample/SampleWithProblems.kt | 17 | 13 | WARNING | Unused variable |
+| sample/SampleWithProblems.kt | 17 | 13 | WARNING | Property "message" is never used |
+| sample/SampleWithProblems.kt | 21 | 9 | WARNING | Function "compute" is never used |
+| sample/SampleWithProblems.kt | 27 | 9 | WARNING | Unreachable code |
+| sample/SampleWithProblems.kt | 27 | 16 | WARNING | Unreachable code |
+| sample/SampleWithProblems.kt | 27 | 17 | WARNING | Unreachable code |
+| sample/SampleWithProblems.kt | 27 | 18 | WARNING | Unreachable code |
+| sample/SampleWithProblems.kt | 27 | 28 | WARNING | Unreachable code |
+| sample/SampleWithProblems.kt | 27 | 29 | WARNING | Unreachable code |
+| sample/SampleWithProblems.kt | 31 | 9 | WARNING | Function "broken" is never used |
+| sample/SampleWithProblems.kt | 37 | 9 | WARNING | Function "callMissing" is never used |
+| sample/SampleWithProblems.kt | 42 | 9 | WARNING | Function "redundantCheck" is never used |
+| sample/SampleWithProblems.kt | 43 | 13 | WARNING | Condition is always 'true'. |
+| sample/SampleWithProblems.kt | 49 | 9 | WARNING | Function "alwaysFalse" is never used |
+| sample/SampleWithProblems.kt | 51 | 16 | WARNING | Condition 'x == 5' is always true |
+| sample/SampleWithProblems.kt | 51 | 16 | WARNING | Condition 'x == 5 && x == 6' is always false |
+| sample/SampleWithProblems.kt | 51 | 26 | WARNING | Condition 'x == 6' is always false when reached |
+| sample/SampleWithProblems.kt | 51 | 16 | INFORMATION | Expression should use clarifying parentheses |
+| src/main/resources/META-INF/plugin.xml | 135 | 30 | WARNING | Extract displayName for i18n |
+| src/main/resources/META-INF/plugin.xml | 136 | 10 | WARNING | Extract text/description for i18n |
+| src/main/resources/META-INF/plugin.xml | 142 | 10 | WARNING | Extract text/description for i18n |
+| src/main/resources/META-INF/plugin.xml | 153 | 10 | WARNING | Extract text/description for i18n |
+| src/main/resources/META-INF/plugin.xml | 1 | 2 | INFORMATION | Namespace '' is not bound |
+| src/main/resources/META-INF/plugin.xml | 165 | 3 | INFORMATION | Namespace '' is not bound |

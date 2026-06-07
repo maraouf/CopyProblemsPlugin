@@ -24,6 +24,8 @@ sample/SampleWithProblems.kt:10:7 [WARNING] Class "SampleWithProblems" is never 
 sample/SampleWithProblems.kt:13:17 [WARNING] Property "unusedField" is never used
 ```
 
+![Plain text output](docs/screenshots/plain-output-example.png)
+
 When the scope covers more than one file (open editors, VCS-changed, or a
 directory), the plain output is grouped per file under a `# path` header:
 
@@ -44,6 +46,8 @@ You can also copy as a **Markdown table**:
 | src/main/kotlin/Bar.kt | 3 | 5 | ERROR | Unresolved reference: doThing |
 ```
 
+![Markdown table output](docs/screenshots/markdown-table-output-example.png)
+
 …or as a **JSON array** (handy for piping into a script or an AI assistant):
 
 ```json
@@ -52,6 +56,8 @@ You can also copy as a **Markdown table**:
   {"path": "src/main/kotlin/Bar.kt", "line": 3, "col": 5, "severity": "ERROR", "message": "Unresolved reference: doThing"}
 ]
 ```
+
+![JSON array output](docs/screenshots/json-output-example.png)
 
 The separate **Copy All Problems as AI Prompt** action prepends a customizable
 instruction header, so the clipboard is ready to paste into an AI assistant
