@@ -28,7 +28,7 @@ plugins {
 }
 
 group = "com.moraouf"
-version = "1.0.14"
+version = "1.0.15"
 
 repositories {
     mavenCentral()
@@ -96,8 +96,28 @@ intellijPlatform {
     pluginConfiguration {
         ideaVersion {
             sinceBuild = "222"
-            untilBuild = "261.*"
+            untilBuild = "262.*"
         }
+    }
+    // Which IDEs `verifyPlugin` runs the IntelliJ Plugin Verifier against. 2026.2 (build 262) is the
+    // new until-build ceiling and the one we need to confirm; the community 2022.3 base covers the floor.
+    pluginVerification {
+        ides {
+            // Community/Ultimate merged into one "IntelliJ IDEA" distribution as of 2025.3 (253); the
+            // old IntellijIdeaCommunity coordinates stop at 2025.2, so 2026.2 must use the unified type.
+            create(org.jetbrains.intellij.platform.gradle.IntelliJPlatformType.IntellijIdea, "2026.2")
+            create(org.jetbrains.intellij.platform.gradle.IntelliJPlatformType.IntellijIdeaCommunity, "2022.3")
+        }
+    }
+}
+
+// Stamp the Gradle `version` into version.properties so the settings panel can show it without the
+// PluginManager/PluginManagerCore.getPlugin descriptor lookup (marked @ApiStatus.Internal on 2026.2+).
+// Captured into a local so the execution-time filter closure doesn't read the Project (config cache).
+tasks.processResources {
+    val pluginVersion = project.version.toString()
+    filesMatching("com/moraouf/copyproblems/version.properties") {
+        filter<org.apache.tools.ant.filters.ReplaceTokens>("tokens" to mapOf("version" to pluginVersion))
     }
 }
 

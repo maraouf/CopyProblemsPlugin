@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.moraouf.copyproblems</id>
     <name>Copy All Problems</name>
-    <version>1.0.14</version>
+    <version>1.0.15</version>
     <vendor email="me@moraouf.com" url="https://moraouf.com">Mohamed Abdelraouf</vendor>
 
     <description><![CDATA[
@@ -44,6 +44,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.15</b>
+        <ul>
+            <li>Compatibility: raised the supported IDE range to include <b>2026.2</b> (build 262).</li>
+            <li>Internal: replaced deprecated and internal IntelliJ SDK API usages (combo-box renderer, plugin-version lookup) so the plugin verifies cleanly against the newer platforms.</li>
+        </ul>
         <b>1.0.14</b>
         <ul>
             <li>New <b>Default scope</b> setting (Settings &rarr; Tools &rarr; Copy All Problems): choose which files the action copies problems from &mdash; the <b>active file</b> (default, unchanged), <b>all open editors</b>, <b>VCS-changed files</b> (the git working-tree changes; nothing to scan when the project isn't under version control), or the <b>active file's directory</b> (recursive). Multi-file scopes emit a per-file grouped list with a <code>#&nbsp;path</code> header for each file.</li>
@@ -136,7 +141,7 @@
         <notificationGroup id="Copy All Problems" displayType="BALLOON"/>
     </extensions>
 
-    <idea-version since-build="222" until-build="261.*"/>
+    <idea-version since-build="222" until-build="262.*"/>
 
     <actions>
         <action id="moraouf.CopyProblemsAction"

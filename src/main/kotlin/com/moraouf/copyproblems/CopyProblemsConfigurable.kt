@@ -1,10 +1,7 @@
 package com.moraouf.copyproblems
 
-import com.intellij.ide.plugins.PluginManagerCore
-import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.ComboBox
-import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBRadioButton
@@ -15,8 +12,11 @@ import java.awt.FlowLayout
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.ButtonGroup
+import javax.swing.DefaultListCellRenderer
 import javax.swing.JComponent
+import javax.swing.JList
 import javax.swing.JPanel
+import javax.swing.ListCellRenderer
 
 class CopyProblemsConfigurable : Configurable {
 
@@ -46,15 +46,11 @@ class CopyProblemsConfigurable : Configurable {
         JBCheckBox("Reformat the file (Reformat Code) before copying, to clear whitespace/formatting warnings")
 
     private val scopeCombo = ComboBox(CopyProblemsSettings.CopyScope.values()).apply {
-        renderer = SimpleListCellRenderer.create { label, value, _ ->
-            label.text = value?.let { scopeLabel(it) } ?: ""
-        }
+        renderer = labelRenderer { (it as? CopyProblemsSettings.CopyScope)?.let(::scopeLabel).orEmpty() }
     }
 
     private val formatCombo = ComboBox(CopyProblemsSettings.OutputFormat.values()).apply {
-        renderer = SimpleListCellRenderer.create { label, value, _ ->
-            label.text = value?.let { formatLabel(it) } ?: ""
-        }
+        renderer = labelRenderer { (it as? CopyProblemsSettings.OutputFormat)?.let(::formatLabel).orEmpty() }
     }
 
     private val rbModal = JBRadioButton("Modal popup with OK button")
@@ -182,7 +178,7 @@ class CopyProblemsConfigurable : Configurable {
         panel.add(rbSilent)
 
         panel.add(Box.createVerticalStrut(16))
-        val version = PluginManagerCore.getPlugin(PluginId.getId("com.moraouf.copyproblems"))?.version
+        val version = pluginVersion()
         val versionText = if (version != null) "Copy All Problems v$version" else "Copy All Problems"
         val versionLabel = JBLabel("<html><i>$versionText</i></html>")
         versionLabel.foreground = JBUI.CurrentTheme.ContextHelp.FOREGROUND
@@ -246,11 +242,44 @@ class CopyProblemsConfigurable : Configurable {
         formatCombo.selectedItem as? CopyProblemsSettings.OutputFormat
             ?: CopyProblemsSettings.OutputFormat.PLAIN
 
+    /**
+     * A combo-box renderer that shows [textFn] applied to each value. Built on the core-Swing
+     * DefaultListCellRenderer rather than com.intellij.ui.SimpleListCellRenderer, whose create(...)
+     * factories are scheduled for removal and whose class is deprecated outright on 2026.2+.
+     * DefaultListCellRenderer is never deprecated, exists on every supported platform, and already
+     * honors the IDE's list selection colors via super.getListCellRendererComponent.
+     */
+    private fun labelRenderer(textFn: (Any?) -> String): ListCellRenderer<Any?> =
+        object : DefaultListCellRenderer() {
+            override fun getListCellRendererComponent(
+                list: JList<*>?,
+                value: Any?,
+                index: Int,
+                isSelected: Boolean,
+                cellHasFocus: Boolean,
+            ): Component {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
+                text = textFn(value)
+                return this
+            }
+        }
+
     private fun formatLabel(format: CopyProblemsSettings.OutputFormat): String = when (format) {
         CopyProblemsSettings.OutputFormat.PLAIN -> "Plain text (path:line:col [SEVERITY] description)"
         CopyProblemsSettings.OutputFormat.MARKDOWN_TABLE -> "Markdown table"
         CopyProblemsSettings.OutputFormat.JSON -> "JSON array"
     }
+
+    /**
+     * The plugin version, read from a resource that Gradle stamps at build time (see
+     * processResources in build.gradle.kts). Reading it this way avoids the plugin-descriptor
+     * lookup APIs (PluginManager/PluginManagerCore.getPlugin), which are marked @ApiStatus.Internal
+     * on 2026.2+, and keeps the version single-sourced from the Gradle `version`.
+     */
+    private fun pluginVersion(): String? =
+        javaClass.getResourceAsStream("version.properties")?.use { stream ->
+            java.util.Properties().apply { load(stream) }.getProperty("version")?.takeIf { it.isNotBlank() }
+        }
 
     private class CheckboxBinding(
         private val cb: JBCheckBox,

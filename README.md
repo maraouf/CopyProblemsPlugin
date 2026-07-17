@@ -148,7 +148,7 @@ The plugin zip will appear at (the version follows the `version` in
 `build.gradle.kts`):
 
 ```
-dist/copy-problems-1.0.14.zip
+dist/copy-problems-1.0.15.zip
 ```
 
 ## Install in your IDE
