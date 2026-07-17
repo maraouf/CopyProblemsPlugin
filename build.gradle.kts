@@ -9,8 +9,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 buildscript {
     configurations.classpath {
         resolutionStrategy.force(
-            "com.fasterxml.jackson.core:jackson-core:2.21.1",
-            "com.fasterxml.jackson.core:jackson-databind:2.21.1",
+            "com.fasterxml.jackson.core:jackson-core:2.21.5",
+            "com.fasterxml.jackson.core:jackson-databind:2.21.5",
             "com.fasterxml.jackson.core:jackson-annotations:2.21",
             "com.fasterxml.jackson.module:jackson-module-kotlin:2.21.1",
             // undertow-core 2.3.24.Final (transitive via the same plugin) trips a Dependabot DoS
